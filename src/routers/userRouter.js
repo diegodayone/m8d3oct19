@@ -5,7 +5,6 @@ const passport = require("passport")
 
 const router = express.Router()
 
-
 //this creates a user starting from username and password
 router.post("/signup", async (req, res) => {
     try{
