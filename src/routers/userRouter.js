@@ -2,7 +2,6 @@ const express = require("express")
 const UserModel = require("../models/user")
 const { getToken } = require("../utils/auth")
 const passport = require("passport")
-
 const router = express.Router()
 
 //this creates a user starting from username and password
@@ -44,5 +43,14 @@ router.post("/refresh", passport.authenticate("jwt"), async(req, res)=>{
 router.get("/bankaccounts", passport.authenticate("jwt"), async (req, res)=>{
     res.send(req.user);
 })
+
+router.post("/changepassword", passport.authenticate("local"), async(req, res)=>{
+        const user = await UserModel.findById(req.user._id)
+        const result = await user.setPassword(req.body.newPassword)
+        user.save() // <= remember to save the object, since setPassword is not committing to the db
+        console.log(result) 
+        res.send(result) 
+    }
+)
 
 module.exports = router;

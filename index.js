@@ -8,7 +8,6 @@ const dotenv = require("dotenv")
 dotenv.config()
 const auth = require("./src/utils/auth")
 
-
 mongoose.connect(process.env.MONGODB, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => console.log(err ? err : "Mongo Connected"))
 
 const server = express();
