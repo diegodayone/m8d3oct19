@@ -3,10 +3,11 @@ const mongoose = require("mongoose")
 const passport = require("passport")
 const cors = require("cors")
 const userRouter = require("./src/routers/userRouter")
+const dotenv = require("dotenv")
+dotenv.config()
 const auth = require("./src/utils/auth")
 
-
-mongoose.connect("mongodb://127.0.0.1:27017/m8", { useNewUrlParser: true, useUnifiedTopology: true }, (err) => console.log(err ? err : "Mongo Connected"))
+mongoose.connect(process.env.MONGODB, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => console.log(err ? err : "Mongo Connected"))
 
 const server = express();
 
