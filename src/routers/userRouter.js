@@ -5,34 +5,44 @@ const passport = require("passport")
 
 const router = express.Router()
 
+
+//this creates a user starting from username and password
 router.post("/signup", async (req, res) => {
     try{
         const user = await UserModel.register(req.body, req.body.password)
-        res.send(user)
-    }
+        // res.send(user)
+        const token = getToken({ _id: user._id })
+            res.send({
+                access_token: token,
+                user: user
+            })
+        }
     catch(exx){
         console.log(exx)
         res.status(500).send(exx)
     }
 })
 
+//this will check the user credentials (username and password in the body) and generate a new token
 router.post("/signin", passport.authenticate("local"), async(req, res)=>{
-    //if we have some right credentials
-    //we can forge a new secure access token for the user
-    //we can save arbitrary info into the token
-
-    // const randomToken = jwt.sign({ username: req.user.username}, process.env.TOKEN_PASSWORD, { expiresIn: 3600 })
     const token = getToken({ _id: req.user._id })
     res.send({
         access_token: token,
-        user: req.user,
-        success: true,
-        message: "User successfully logged in"
+        user: req.user
     })
 })
 
-router.get("/bankaccounts", passport.authenticate("jwt"), async (req, res)=>{
+//this will check the user credentials (access token) and generate a new token
+router.post("/refresh", passport.authenticate("jwt"), async(req, res)=>{
+    const token = getToken({ _id: req.user._id })
+    res.send({
+        access_token: token,
+        user: req.user
+    })
+})
 
+//this will check the Authorization: Bearer Token and return the current user
+router.get("/bankaccounts", passport.authenticate("jwt"), async (req, res)=>{
     res.send(req.user);
 })
 

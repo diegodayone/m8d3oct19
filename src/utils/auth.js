@@ -11,26 +11,33 @@ dotenv.config()
 passport.serializeUser(UserModel.serializeUser())
 passport.deserializeUser(UserModel.deserializeUser())
 
-console.log('env', process.env.TOKEN_PASSWORD, process.env.MONGODB)
+passport.use(new LocalStrategy(UserModel.authenticate())) // this strategy will be used when we ask passport to passport.authenticate("local")
 
 //-----------------JWT AREA-------------------------------------
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), //Authorization: Bearer TOKEN
     secretOrKey: process.env.TOKEN_PASSWORD //
 }
+
+passport.use(new JwtStrategy(jwtOptions, (jwtPayload, callback) =>{ //this strategy will be used when we ask passport to passport.authenticate("jwt")
+    UserModel.findById(jwtPayload._id, (err, user) => { //looks into the collection
+        if (err) return callback(err, false) // ==> Something went wrong getting the info from the db
+        else if (user) return callback(null, user) // ==> Existing user, all right!
+        else return callback(null, false) // ==> Non existing user
+    })
+    // try{
+    //     const user = await UserModel.findById(jwtPayload._id)
+    //     if (user)
+    //         return callback(null, user)
+    //     else 
+    //         return callback(null, false)
+    // }   
+    // catch(exx){
+    //     return callback(exx, false)
+    // } 
+}))
 //-----------------JWT AREA-------------------------------------
 
-//2) We need to create and export our local strategy in order to verify username and password
 module.exports = {
-    local: passport.use(new LocalStrategy(UserModel.authenticate())), //this will check in the request body for username and password and verify them
-    //-----------------JWT AREA-------------------------------------
-    jwtPassport: passport.use(new JwtStrategy(jwtOptions, (jwtPayload, callback) =>{
-        UserModel.findById(jwtPayload._id, (err, user) => {
-            if (err) return callback(err, false) // ==> Something went wrong getting the info from the db
-            else if (user) return callback(null, user) // ==> Existing user, all right!
-            else return callback(null, false) // ==> Non existing user
-        })
-    })),
     getToken: (user) => jwt.sign(user, jwtOptions.secretOrKey, { expiresIn: 3600 }) //this is just an helper to have a central point for token generation
-    //-----------------JWT AREA-------------------------------------
 }
