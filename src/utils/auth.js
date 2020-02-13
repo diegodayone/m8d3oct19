@@ -41,17 +41,11 @@ passport.use("fb", new FbStrategy({
     clientID: process.env.FB_ID,
     clientSecret: process.env.FB_KEY
 }, async (accessToken, refreshToken, facebookProfile, next) =>{
-    //console.log(accessToken)
-    console.log(facebookProfile)
-
-    //we can check if we have a user with the given facebookId or create a new user with the information we are receiving from facebook!
-    //search for a user with the given FB ID
     try{
-        console.log(facebookProfile.id)
-        const userFromFacebookId = await UserModel.findOne({ facebookId: facebookProfile.id})
-        if (userFromFacebookId)
+        const userFromFacebookId = await UserModel.findOne({ facebookId: facebookProfile.id}) //search for a user with a give fbid
+        if (userFromFacebookId) //if we have a user we return the user
             return next(null, userFromFacebookId)
-        else
+        else //we create a user starting from facebook data!
         {
             const newUser = await UserModel.create({
                 role:"User",
@@ -59,14 +53,15 @@ passport.use("fb", new FbStrategy({
                 username: facebookProfile.emails[0].value,
                 firstName: facebookProfile.name.givenName,
                 lastName: facebookProfile.name.familyName,
-                avatar: facebookProfile.photos[0].value
+                avatar: facebookProfile.photos[0].value,
+                refreshToken: refreshToken
             })
-            return next(null, newUser) // => Not found!
+            return next(null, newUser) // pass on the new user!
         }
         //return next(null, userFromFacebookId || false)
     }
     catch(exx){
-        return next (exx)
+        return next (exx) //report error
     }
 }))
 
