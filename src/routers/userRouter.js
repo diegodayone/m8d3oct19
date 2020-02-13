@@ -62,7 +62,4 @@ router.post("/facebookLogin", passport.authenticate("fb"), async(req, res)=>{
     })
 } )
 
-
-
-
 module.exports = router;

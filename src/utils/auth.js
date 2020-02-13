@@ -65,6 +65,7 @@ passport.use("fb", new FbStrategy({
     }
 }))
 
+
 module.exports = {
     getToken: (user) => jwt.sign(user, jwtOptions.secretOrKey, { expiresIn: 3600 }) //this is just an helper to have a central point for token generation
 }
