@@ -53,4 +53,16 @@ router.post("/changepassword", passport.authenticate("local"), async(req, res)=>
     }
 )
 
+// receives the facebooks access_token in the body and generates a token for our app
+router.post("/facebookLogin", passport.authenticate("fb"), async(req, res)=>{
+    const token = getToken({ _id: req.user._id })
+    res.send({
+        access_token: token,
+        user: req.user
+    })
+} )
+
+
+
+
 module.exports = router;

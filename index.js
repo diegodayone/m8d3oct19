@@ -19,5 +19,4 @@ server.use(passport.initialize())
 server.use("/user", userRouter)
 server.use("/tweets", tweetRouter)
 
-
 server.listen(process.env.PORT || 3451, ()=> console.log("Web Server is running"))
